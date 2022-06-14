@@ -1,6 +1,6 @@
 # Learning Robust Control Barrier Functions for Guaranteed Safety of Car-Like Robots
 
-This is the code base for the CORL2022 submission "Learning Robust Control Barrier Functions for Guaranteed Safety of Car-Like Robots". It contains simulation code Python and a ros package for implementation.
+This is the code base for the CORL2022 submission "Learning Robust Control Barrier Functions for Guaranteed Safety of Car-Like Robots". It contains simulation code Python and a ROS package for implementation.
 
 ## Simulation
 
