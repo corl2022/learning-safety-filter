@@ -11,7 +11,7 @@ Samples from the Euclidean Distance Function (EDF) of a road are loaded and used
 
 ## ROS package 
 
-This is the packge we used for experimental validation on the 1:10 RC car. All required parameters to start node 'cbf_safety_filter' are set via config/cbf_params.yaml. The velocity command is published as a Twist message, with constant linear velocity in x and angular velocity being computed by the filter. The trained model incl. scaler are loaded via the launch file. Importantly, the scaler needs to be the standard scaler as it affects the computations of the steering command.
+This is the packge we used for experimental validation on the 1:10 RC car (see 'https://www.youtube.com/watch?v=U8eZPTDpHEo'). All required parameters to start node 'cbf_safety_filter' are set via config/cbf_params.yaml. The velocity command is published as a Twist message, with constant linear velocity in x and angular velocity being computed by the filter. The trained model incl. scaler are loaded via the launch file. Importantly, the scaler needs to be the standard scaler as it affects the computations of the steering command.
 
 The node subscribes to 
 ```
