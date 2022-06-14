@@ -11,7 +11,7 @@ Samples from the Euclidean Distance Function (EDF) of a road are loaded and used
 
 ## ROS package 
 
-This is the packge we used for experimental validation on the 1:10 RC car (see 'https://www.youtube.com/watch?v=U8eZPTDpHEo'). All required parameters to start node 'cbf_safety_filter' are set via config/cbf_params.yaml. The velocity command is published as a Twist message, with constant linear velocity in x and angular velocity being computed by the filter. The trained model incl. scaler are loaded via the launch file. Importantly, the scaler needs to be the standard scaler as it affects the computations of the steering command.
+This is the packge we used for experimental validation on the 1:10 RC car (see 'https://www.youtube.com/watch?v=U8eZPTDpHEo'). All required parameters to start node 'cbf_safety_filter' are set via config/cbf_params.yaml. The velocity command is published as a Twist message, with constant linear velocity in x and angular velocity being computed by the filter. The trained model using scikit-learn ('https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html') incl. scaler are loaded via the launch file. Importantly, the scaler needs to be the standard scaler as it affects the computations of the steering command.
 
 The node subscribes to 
 ```
@@ -20,7 +20,7 @@ POSE_TOPIC_NAME = '/amcl_pose'
 for position estimation and publishes the velocity command (throttle command linear.x is from [-1,1]! Conversion from velocity is necessary in this case, see below.) and filter data (see msg/CbfFilterData for message details) on
 ```
 CMD_VEL_PUB_TOPIC = '/cmd_vel'
-FILTER_TOPIC_NAME = '/cbf/FilterData'
+FILTER_TOPIC_NAME = '/cbf/filterData'
 ```
 These values can be adjusted in scripts/cbf_node.py.
 
@@ -28,4 +28,4 @@ For the mapping from velocity to throttle command [-1,1], we use the linear func
 ```math
 throttle = av+b
 ```
-The parameter a refers to 'vel2throttle_grad' and b to 'vel2throttle_off', both set in config/cbf_params.yaml. We estimated them in experiments.
+The parameter "a" refers to 'vel2throttle_grad' and "b" to 'vel2throttle_off', both set in config/cbf_params.yaml. They need to be adjusted to the particular case.

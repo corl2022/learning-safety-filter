@@ -17,7 +17,7 @@ from cbf_pkg.msg import CbfFilterData
 POSE_TOPIC_NAME = '/amcl_pose'
 CMD_VEL_PUB_TOPIC = '/cmd_vel'
 NODE_NAME = 'cbf_safety_filter'
-FILTER_TOPIC_NAME = '/cbf/FilterData'
+FILTER_TOPIC_NAME = '/cbf/filterData'
 
 
 class CbfSafetyFilter:
