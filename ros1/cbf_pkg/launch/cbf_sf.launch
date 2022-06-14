@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <group ns="cbf">
+    <rosparam file="$(find cbf_pkg)/config/cbf_params.yaml" />
+    <param name="svm_model_name" value="$(find cbf_pkg)/svm_models/svm_model_ebu2_courtyart_22-06-10.joblib" />
+    <param name="svm_scaler_name" value="$(find cbf_pkg)/svm_models/svm_scaler_ebu2_courtyart_22-06-10.joblib" />
+  </group>
+  <node name="cbf_sf_node" pkg="cbf_pkg" type="cbf_node.py" output="screen"/>
+
+  <!-- manually started
+  <include file="$(find nav2_pkg)/launch/localization.launch">
+    <arg name="map_file" default="ebu2_infront_lab.yaml" />
+  </include>
+  -->
+
+  <!-- Rviz
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nav2_pkg)/config/rviz/amcl.rviz" />
+  -->
+</launch>
