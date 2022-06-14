@@ -30,10 +30,10 @@ class CbfSafetyFilter:
         self.cbf_control_pub = rospy.Publisher(SAFE_CONTROL_TOPIC_NAME, CbfFilterData, queue_size=1)
 
         # Actuator and CBF values
-        self.alpha = rospy.get_param('/cbf/alpha', .5)  # offset of EDF (\delta in paper)
-        self.c1_gain = rospy.get_param('/cbf/c1_gain', 1)  # CBF gain
-        self.c2_gain = rospy.get_param('/cbf/c2_gain', 1)  # CBF gain
-        self.c3_gain = rospy.get_param('/cbf/c3_gain', 1)  # CBF gain
+        self.beta = rospy.get_param('/cbf/beta', .5)  # offset of EDF (\delta in paper)
+        self.alpha0 = rospy.get_param('/cbf/alpha0', 1)  # CBF gain
+        self.alpha1 = rospy.get_param('/cbf/alpha1', 1)  # CBF gain
+        self.alpha2 = rospy.get_param('/cbf/alpha2', 1)  # CBF gain
         self.Ts = rospy.get_param('/cbf/Ts', .01)
         self.observe_computation_time = rospy.get_param('/cbf/observe_computation_time', False)  # Log computing time 
         self.svm_model_name = rospy.get_param('/cbf/svm_model_name')  # Model parameter
@@ -211,19 +211,19 @@ class CbfSafetyFilter:
         start_time = time.time()
         h0 = float(h)
         Lfh0 = g @ xyd
-        h1 = Lfh0 + self.c1_gain * h0
+        h1 = Lfh0 + self.alpha0 * h0
 
-        Lfh1 = xyd.T @ H @ xyd + g @ f2 + self.c1_gain * Lfh0
+        Lfh1 = xyd.T @ H @ xyd + g @ f2 + self.alpha0 * Lfh0
         Lgh1 = g @ g2
-        h2 = Lfh1 + np.abs(Lgh1) * umin_ + self.c2_gain * h1
+        h2 = Lfh1 + np.abs(Lgh1) * umin_ + self.alpha1 * h1
 
-        Lfh2 = 3 * xyd.T @ H @ f2 + np.dot(np.dot(np.dot(xyd, K), xyd), xyd) + (self.c1_gain+self.c2_gain) * (xyd.T @ H @ xyd + g @ f2) \
-            + self.c1_gain * self.c2_gain * g @ xyd + g @ ff2 + np.sign(g @ g2) * (xyd.T @ H @ g2 + g @ fg2) * umin_
-        Lgh2 = 2 * xyd.T @ H @ g2 + (self.c1_gain+self.c2_gain) * g @ g2 + g @ gf2 + np.sign(g @ g2) * g @ gg2 * umin_
+        Lfh2 = 3 * xyd.T @ H @ f2 + np.dot(np.dot(np.dot(xyd, K), xyd), xyd) + (self.alpha0+self.alpha1) * (xyd.T @ H @ xyd + g @ f2) \
+            + self.alpha0 * self.alpha1 * g @ xyd + g @ ff2 + np.sign(g @ g2) * (xyd.T @ H @ g2 + g @ fg2) * umin_
+        Lgh2 = 2 * xyd.T @ H @ g2 + (self.alpha0+self.alpha1) * g @ g2 + g @ gf2 + np.sign(g @ g2) * g @ gg2 * umin_
 
 
         # Safe control computation
-        num = -(Lfh2 + self.c3_gain * h2)
+        num = -(Lfh2 + self.alpha2 * h2)
         if np.abs(Lgh2) < bound_:
             usafe_ = float(num * np.sign(Lgh2) / bound_)
         else:
@@ -237,10 +237,10 @@ class CbfSafetyFilter:
         end_time = time.time()
 
         # Lie derivatives for data output
-        Lfh1_Lgh1usafe_ch1 = Lfh1 + Lgh1 * usafe_ + self.c2_gain * h1
-        Lfh1_Lgh1unom_ch1 = Lfh1 + Lgh1 * self.unom + self.c2_gain * h1
-        Lfh2_Lgh2usafe_ch2 = Lfh2 + Lgh2 * usafe_ + self.c3_gain * h2
-        Lfh2_Lgh2unom_ch2 = Lfh2 + Lgh2 * self.unom + self.c3_gain * h2
+        Lfh1_Lgh1usafe_ch1 = Lfh1 + Lgh1 * usafe_ + self.alpha1 * h1
+        Lfh1_Lgh1unom_ch1 = Lfh1 + Lgh1 * self.unom + self.alpha1 * h1
+        Lfh2_Lgh2usafe_ch2 = Lfh2 + Lgh2 * usafe_ + self.alpha2 * h2
+        Lfh2_Lgh2unom_ch2 = Lfh2 + Lgh2 * self.unom + self.alpha2 * h2
         
         if self.observe_computation_time:
             time_vec += end_time - start_time
@@ -271,7 +271,7 @@ class CbfSafetyFilter:
 
         # Barrier function
         hs = dc @ Hi
-        h = hs + b - self.alpha
+        h = hs + b - self.beta
 
         # Gradient
         G = np.multiply(Xi_X.T, [Hi, Hi]) * dc

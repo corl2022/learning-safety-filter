@@ -1,7 +1,7 @@
-alpha : .43
-c1_gain : 2
-c2_gain : 2
-c3_gain : 2
+beta : .43
+alpha0 : 2
+alpha1 : 2
+alpha2 : 2
 Ts : 0.01
 observe_computation_time : False
 nom_steering_cmd: 0.
