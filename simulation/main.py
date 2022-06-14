@@ -122,8 +122,8 @@ if __name__ == '__main__':
     ax3.plot(ode_sol_ct.t, unom_ct, label=r'$u_{\rm nom}$', linewidth=2)
     ax3.plot(ode_sol_ct.t, usafe_ct, label=r'$u_{\rm safe}$', linewidth=2)
     ax3.plot(ode_sol_ct.t, u_ct, label=r'$u_{\rm or}$', linewidth=2, linestyle='dashed')
-    ax2.plot([0, ode_sol_ct.t[-1]], [max_steering_rate] * 2, label=r'$u_{\rm max}$', linewidth=2)
-    ax2.plot([0, ode_sol_ct.t[-1]], [-max_steering_rate] * 2, label=r'$u_{\rm min}$', linewidth=2)
+    ax3.plot([0, ode_sol_ct.t[-1]], [max_steering_rate] * 2, label=r'$u_{\rm max}$', linewidth=2)
+    ax3.plot([0, ode_sol_ct.t[-1]], [-max_steering_rate] * 2, label=r'$u_{\rm min}$', linewidth=2)
     plt.legend()
 
     # Barriers
