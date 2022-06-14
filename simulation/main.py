@@ -1,5 +1,4 @@
-import control_clean
-import car_model_clean
+import control
 import car_model
 from sklearn import svm, preprocessing
 import numpy as np
@@ -10,7 +9,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from scipy.io import loadmat
 from scipy.special import expit
-from heapq import merge
 
 
 def getInputData(msg):
@@ -66,7 +64,7 @@ if __name__ == '__main__':
     me = max_error(y_test, y_pred)
 
     # Robustness parameter
-    alpha = me + .5
+    alpha = me
 
     # Plot track
     Zf = model.predict(Xf_transformed) - alpha
@@ -86,21 +84,21 @@ if __name__ == '__main__':
 
     # Parameters
     goal = np.array([0, 0])
-    car = car_model_clean.Car()
+    car = car_model.Car()
     max_steering = car.getParams()['max_steering']
     max_steering_rate = car.getParams()['max_steering_rate']
-    cbf_gains = {"c1": 4, "c2": 4, "c3": 4}  # class-K functions; set to constants c1, c2, c3
+    cbf_gains = {"c1": 1.5, "c2": 1.5, "c3": 1.5}  # class-K functions; set to constants c1, c2, c3
     svm_params = {"b": model.intercept_, "dc": model.dual_coef_, "sv": model.support_vectors_,
                   "gamma": model.get_params()["gamma"], "scaler": scaler}
-    x0 = np.array([14, 70, -np.pi*1/3, 0])  # Initial condition [X,Y,heading,steering angle] in SI
-    tend = 50  # simulation time
+    x0 = np.array([40, 60, -np.pi*1/3, 0])  # Initial condition [X,Y,heading,steering angle] in SI
+    tend = 400  # simulation time
 
     # Time computation for overriding control
     time_it = False
     time_loop = False  # execute simple time_loop and compare time to vectorized version
 
     # Run continuous-time (CT) sim
-    ode_sol_ct = ode(control_clean.ctClosedLoop, [0, tend], x0, args=(car, cbf_gains, svm_params, goal, alpha),
+    ode_sol_ct = ode(control.ctClosedLoop, [0, tend], x0, args=(car, cbf_gains, svm_params, goal, alpha),
                      method='RK45', max_step=1e-1)
 
     # Rerun to collect variables
@@ -117,7 +115,7 @@ if __name__ == '__main__':
     for i in range(len(ode_sol_ct.t)):
         dx, u_ct[i], unom_ct[i], usafe_ct[i], time_vec_ct[i], time_loop_ct[i], Lfh2_Lgh2unom_ch2_ct[i], \
         Lfh2_Lgh2usafe_ch2_ct[i], h2_ct[i], Lfh1_Lgh1usafe_ch1_ct[i], h0_ct[i] = \
-            control_clean.ctClosedLoop(ode_sol_ct.t[i], ode_sol_ct.y[:, i], car, cbf_gains, svm_params, goal,
+            control.ctClosedLoop(ode_sol_ct.t[i], ode_sol_ct.y[:, i], car, cbf_gains, svm_params, goal,
                                        alpha, solver=False, time_it=time_it, loop=time_loop)
 
     # Compute  Lfh2_Lgh2u_ch2_ct

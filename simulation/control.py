@@ -2,7 +2,6 @@ import sympy as sp
 import numpy as np
 import time
 import sys
-import car_model_clean
 from scipy.special import expit, logit
 
 def ctClosedLoop(t, x, car, gains, svm_params, goal, alpha, solver=True, time_it=False, loop=False):
