@@ -11,28 +11,6 @@ from scipy.io import loadmat
 from scipy.special import expit
 
 
-def getInputData(msg):
-    # Generate input/output vector
-    width = msg["info"]["width"]
-    height = msg["info"]["height"]
-    resolution = msg["info"]["resolution"]
-    origin = msg["info"]["origin"]
-    # Works for picture
-    # x = np.arange(0, width, resolution)
-    # y = np.arange(0, height, resolution)
-    # X, Y = np.meshgrid(x, y)
-    # input_data = np.column_stack([X.ravel(), Y.ravel()])
-    # return input_data, X, Y, x, y
-
-    # Real map from ROS (faster)
-    x = np.arange(origin[0], origin[0] + width * resolution, resolution)
-    y = np.arange(origin[0] + height * resolution, origin[0], -resolution)
-    g = np.meshgrid(x, y)
-    input_data = np.vstack(map(np.ravel, g)).T
-    return input_data, x, y, g
-
-
-
 if __name__ == '__main__':
 
     # Load EDF
