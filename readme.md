@@ -26,7 +26,6 @@ These values can be adjusted in scripts/cbf_node.py.
 
 For the mapping from velocity to throttle command [-1,1], we use the linear function 
 ```math
-u_{\rm throttle} = av+b
+throttle = av+b
 ```
-which we estimated in experiments.
-The parameter a refers to 'vel2throttle_grad' and b to 'vel2throttle_off', both set in config/cbf_params.yaml.
+The parameter a refers to 'vel2throttle_grad' and b to 'vel2throttle_off', both set in config/cbf_params.yaml. We estimated them in experiments.
