@@ -24,9 +24,9 @@ FILTER_TOPIC_NAME = '/cbf/filterData'
 ```
 These values can be adjusted in scripts/cbf_node.py.
 
-For the mapping from velocity to throttle command [-1,1], we use the linear function 
+For the mapping from velocity, v, to throttle command [-1,1], we use the linear function 
 ```math
-throttle = av+b
+throttle_cmd = a.v + b
 ```
 The parameter "a" refers to 'vel2throttle_grad' and "b" to 'vel2throttle_off', both set in config/cbf_params.yaml. They need to be adjusted to the particular case.
 
