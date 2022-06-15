@@ -26,7 +26,7 @@ class CbfSafetyFilter:
         # Subscriber/publisher
         self.pose_sub = rospy.Subscriber(POSE_TOPIC_NAME, PoseWithCovarianceStamped, self.cbPose)
         self.vel_pub = rospy.Publisher(CMD_VEL_PUB_TOPIC, Twist, queue_size=1)
-        self.cbf_control_pub = rospy.Publisher(SAFE_CONTROL_TOPIC_NAME, CbfFilterData, queue_size=1)
+        self.cbf_control_pub = rospy.Publisher(FILTER_TOPIC_NAME, CbfFilterData, queue_size=1)
 
         # Actuator and CBF values
         self.beta = rospy.get_param('/cbf/beta', .5)  # offset of EDF (\delta in paper)
@@ -40,7 +40,7 @@ class CbfSafetyFilter:
         self.nom_steering = rospy.get_param('/cbf/nom_steering_cmd', 0)  # Nominal steering command
         self.max_steering = rospy.get_param('/cbf/max_steering', 30*180/np.pi)
         self.max_steering_rate = rospy.get_param('/cbf/max_steering_rate', np.pi)
-        self.zero_bound = float(rospy.get_param('/cbf/zero_bound'), 1e-10)  # bound to avoid zero division
+        self.zero_bound = float(rospy.get_param('/cbf/zero_bound', 1e-10))  # bound to avoid zero division
         self.car_length = rospy.get_param('/cbf/car_length', 1)
 
         # Convert throttle cmd to desired speed
