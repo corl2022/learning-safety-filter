@@ -6,6 +6,8 @@ Ts : 0.01
 observe_computation_time : False
 nom_steering_cmd: 0.
 nom_steering_rate_cmd: 0.
+max_steering: .5
+max_steering_rate: 3.
 desired_speed: 0.2204  # approx. equivalent to throttle command of .19 (max_rpm = 5000) which used to work best
 throttle2vel_off: -0.003338359990477  # approximated with least squares in Matlab
 throttle2vel_grad: 4.657488719504763  # approximated with least squares in Matlab
