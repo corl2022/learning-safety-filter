@@ -36,9 +36,8 @@ The efficient implementation using vectorized calculations is part of both the s
 def getBarrier(xy, svm_params, alpha, vectorized=True, loop=False, time_it=False, xdot=[]):
     ...
 ```
-with which we also compare computing time to a for loopo implementation. In the ROs package, the the vectorized computation happens in 
+with which we also compare computing time to a loop implementation. In the ROS package, the vectorized computation happens in 
 ```
 def getBarrierAndPartials(self):
     ...
 ```
-as part of the ROS node.
