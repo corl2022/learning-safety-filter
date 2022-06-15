@@ -3,7 +3,6 @@
 
 import numpy as np
 import time
-from cbf_pkg.car_model import Car
 from joblib import load
 # import dill
 import sklearn
@@ -39,7 +38,6 @@ class CbfSafetyFilter:
         self.svm_model_name = rospy.get_param('/cbf/svm_model_name')  # Model parameter
         self.svm_scaler_name = rospy.get_param('/cbf/svm_scaler_name')  # Scaler for SVM input data
         self.nom_steering = rospy.get_param('/cbf/nom_steering_cmd', 0)  # Nominal steering command
-        self.car_model = rospy.get_param('/cbf/car_model')  # car model
         self.max_steering = rospy.get_param('/cbf/max_steering', 30*180/np.pi)
         self.max_steering_rate = rospy.get_param('/cbf/max_steering_rate', np.pi)
         self.zero_bound = float(rospy.get_param('/cbf/zero_bound'), 1e-10)  # bound to avoid zero division
