@@ -32,12 +32,13 @@ The parameter "a" refers to 'vel2throttle_grad' and "b" to 'vel2throttle_off', b
 
 ## Vectorized computation 
 The efficient implementation using vectorized calculations is part of both the simulation and the ROS package. For the simulation, it is part of the function 
-'''
+```
 def getBarrier(xy, svm_params, alpha, vectorized=True, loop=False, time_it=False, xdot=[]):
     ...
-'''
+```
 with which we also compare computing time to a for loopo implementation. In the ROs package, the the vectorized computation happens in 
 ```
-def getBarrierAndPartials(self)
+def getBarrierAndPartials(self):
+    ...
 ```
 as part of the ROS node.
