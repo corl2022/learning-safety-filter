@@ -4,14 +4,14 @@ This is the code base for the CORL2022 submission "Learning Robust Control Barri
 
 ## Simulation
 
-Samples from the Euclidean Distance Function (EDF) of a road are loaded and used to train a SVM regression model. This model is used to compose a robust safety filter. The learned filter is then used in closed-loop simulation. For the dynamics of the car-like robot we use the modified kinematic bicycle model with constant velocity. The nominal steering angle is supervised by the learned safety filter.
-- 'main' runs the main simulation and plots the results.
+Samples from the Euclidean Distance Function (EDF) of a road are loaded from 'simulation/data/sim_track_S.mat' and used to train a SVM regression model using scikit-learn ('https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html'). This model is used to compose a robust safety filter. The learned filter is then used in closed-loop simulation. For the dynamics of the car-like robot we use the modified kinematic bicycle model with constant velocity. The nominal steering angle is supervised by the learned safety filter.
+- 'main' runs the mßain simulation and plots the results.
 - 'control' contains the dynamics for the solver of the initial value problem, the filter and the nominal control.
 - 'car' contains the Car class with various parameters such as car length and velocity (of the front wheels). 
 
 ## ROS package 
 
-This is the packge we used for experimental validation on the 1:10 RC car (see 'https://www.youtube.com/watch?v=U8eZPTDpHEo'). All required parameters to start node 'cbf_safety_filter' are set via config/cbf_params.yaml. The velocity command (linear speed in x and angular speed in z) is published as a Twist message, with constant velocity in x and angular velocity being computed by the filter. The trained model using scikit-learn ('https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html') incl. scaler are loaded via the launch file (adjust path to your scaler/model). Importantly, the scaler needs to be the standard scaler as it affects the computations of the steering safety filter and hence steering command.
+This is the packge we used for experimental validation on the 1:10 RC car (see 'https://www.youtube.com/watch?v=U8eZPTDpHEo'). All required parameters to start node 'cbf_safety_filter' are set via config/cbf_params.yaml. The velocity command (linear speed in x and angular speed in z) is published as a Twist message, with constant velocity in x set via parameter 'desired_speed' and angular velocity being computed by the filter. The trained model incl. scaler are loaded via the launch file (adjust path to your scaler/model). Importantly, the scaler needs to be the standard scaler as it affects the computations of the safety filter and hence steering command.
 
 The node subscribes to 
 ```
@@ -22,7 +22,7 @@ for position estimation and publishes the velocity command (via Twist) and filte
 CMD_VEL_PUB_TOPIC = '/cmd_vel'
 FILTER_TOPIC_NAME = '/cbf/filterData'
 ```
-These values can be adjusted in scripts/cbf_node.py. Note that the throttle command as part of the Twist message is from [-1,1], where values less than zero mean driving backwards and 1 demands maximum RPM (also a parameter). THus, conversion from desired velocity to throttle value is necessary.
+These values can be adjusted in scripts/cbf_node.py. Note that the throttle command as part of the Twist message is in the range of [-1,1], where values less than zero mean reversing and 1 demands maximum RPM (also a parameter). Thus, conversion from desired velocity to throttle value is necessary.
 
 Particularly, we use the linear function 
 ```math
