@@ -4,7 +4,6 @@
 import numpy as np
 import time
 from joblib import load
-# import dill
 import sklearn
 import rospy
 from geometry_msgs.msg import PoseWithCovarianceStamped, Twist
