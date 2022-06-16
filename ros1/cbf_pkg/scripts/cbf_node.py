@@ -42,11 +42,11 @@ class CbfSafetyFilter:
         self.zero_bound = float(rospy.get_param('/cbf/zero_bound', 1e-10))  # bound to avoid zero division 
         self.car_length = rospy.get_param('/cbf/car_length', 1)
 
-        # Convert throttle cmd to desired speed
+        # Convert desired speed to throttle cmd
         self.desired_speed = rospy.get_param('/cbf/desired_speed')  # constant
-        self.throttle2vel_off = rospy.get_param('/cbf/throttle2vel_off')  # coefficients determined by experiment (see Matlab)
-        self.throttle2vel_grad = rospy.get_param('/cbf/throttle2vel_grad')
-        self.throttle_cmd =  (self.desired_speed-self.throttle2vel_off) / self.throttle2vel_grad
+        self.vel2throttle_off = rospy.get_param('/cbf/vel2throttle_off')  # coefficients determined by experiment (see Matlab)
+        self.vel2throttle_grad = rospy.get_param('/cbf/vel2throttle_grad')
+        self.throttle_cmd =  (self.desired_speed-self.vel2throttle_off) / self.vel2throttle_grad
         
 
         # Initilize class variables
