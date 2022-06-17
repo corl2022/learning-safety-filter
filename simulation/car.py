@@ -1,5 +1,4 @@
 import numpy as np
-from collections import defaultdict
 from scipy.special import expit
 class Car:
 

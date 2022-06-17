@@ -1,18 +1,15 @@
-import sympy as sp
 import numpy as np
 import time
-import sys
 from scipy.special import expit, logit
 
-def ctClosedLoop(t, x, car, gains, svm_params, goal, alpha, solver=True, time_it=False, loop=False):
+def ctClosedLoop(t, x, car, gains, svm_params, goal, alpha, solver=True, loop=False):
 
     # Compute nominal control
     unom = getNomCntrl(x, goal, car)
 
     # Compute safe control
     u, usafe, time_vec, time_loop, Lfh2_Lgh2unom_ch2, Lfh2_Lgh2usafe_ch2, h2, Lfh1_Lgh1usafe_ch1, h0 \
-        = getUOverride(t, x, unom, car, gains, svm_params, alpha, time_it=time_it,
-                       loop=loop)
+        = getUOverride(t, x, unom, car, gains, svm_params, alpha, loop=loop)
 
     # Dynamics
     dx = car.dxdtKinBicycleFront(t, x, u, car)
@@ -25,11 +22,11 @@ def ctClosedLoop(t, x, car, gains, svm_params, goal, alpha, solver=True, time_it
 
 
 
-def getUOverride(t, x, unom, car, gains, svm_params, alpha, time_it=False, loop=False):
+def getUOverride(t, x, unom, car, gains, svm_params, alpha, loop=False):
 
     # Compute safety filter
     usafe, Lfh2_Lgh2usafe_ch2, Lfh2_Lgh2unom_ch2, h2, Lfh1_Lgh1usafe_ch1, h0, time_vec, time_loop \
-        = getUsafeAndBarriers(t, x, car, svm_params, gains, alpha, unom, vectorized=True, loop=loop, time_it=time_it)
+        = getUsafeAndBarriers(t, x, car, svm_params, gains, alpha, unom, vectorized=True, loop=loop)
     start = time.time()
     if Lfh2_Lgh2unom_ch2 <= 0:
         u = usafe
@@ -41,7 +38,7 @@ def getUOverride(t, x, unom, car, gains, svm_params, alpha, time_it=False, loop=
 
     return u, usafe, time_vec, time_loop, Lfh2_Lgh2unom_ch2, Lfh2_Lgh2usafe_ch2, h2, Lfh1_Lgh1usafe_ch1, h0
 
-def getUsafeAndBarriers(t, x, car, svm_params, gains, alpha, unom, vectorized=True, loop=False, time_it=False):
+def getUsafeAndBarriers(t, x, car, svm_params, gains, alpha, unom, vectorized=True, loop=False):
 
     # Start timer
     start_tot = time.time()
@@ -81,7 +78,7 @@ def getUsafeAndBarriers(t, x, car, svm_params, gains, alpha, unom, vectorized=Tr
 
     # Compose ICCBFs
     h, g, H, K, time_vec, time_loop = getBarrier(xy, svm_params, alpha, vectorized=vectorized, loop=loop,
-                                                 time_it=time_it, xdot=xyd)
+                                                 xdot=xyd)
     start_time = time.time()
     h0 = h
     Lfh0 = g @ xyd
@@ -95,25 +92,27 @@ def getUsafeAndBarriers(t, x, car, svm_params, gains, alpha, unom, vectorized=Tr
            + c1 * c2 * g @ xyd + g @ ff2 + np.sign(g @ g2) * (xyd.T @ H @ g2 + g @ fg2) * umin
     Lgh2 = 2 * xyd.T @ H @ g2 + (c1 + c2) * g @ g2 + g @ gf2 + np.sign(g @ g2) * g @ gg2 * umin
 
+    # Compute usafe
     num = -(Lfh2 + c3 * h2)
     den = Lgh2
     if np.abs(den) < bound:
         usafe = num * np.sign(den) / bound
     else:
         usafe = float(num / den)
-    end_time = time.time()
-
-    if np.abs(usafe) > max_steering_rate:
+    if np.abs(usafe) > max_steering_rate:  # Saturate
         usafe = np.sign(usafe) * max_steering_rate
 
+    # Stop timer
+    end_time = time.time()
 
+    # ICCBF inequalities
     Lfh1_Lgh1usafe_ch1 = Lfh1 + Lgh1 * usafe + c2 * h1
     Lfh2_Lgh2usafe_ch2 = Lfh2 + Lgh2 * usafe + c3 * h2
     Lfh2_Lgh2unom_ch2 = Lfh2 + Lgh2 * unom + c3 * h2
 
-    if time_it:
-        time_vec += end_time - start_time + end_tot - start_tot
-        time_loop += end_time - start_time + end_tot - start_tot
+    # Add time of computing barriers and that of computing usafe
+    time_vec += end_time - start_time + end_tot - start_tot
+    time_loop += end_time - start_time + end_tot - start_tot
 
     return float(usafe), Lfh2_Lgh2usafe_ch2[0], Lfh2_Lgh2unom_ch2[0], h2[0], Lfh1_Lgh1usafe_ch1, h0[0], time_vec, time_loop
 
@@ -123,7 +122,19 @@ def getNomCntrl(x, goal, car):
     sgm = expit(x[3])
     delta = max_steering * (2 * sgm - 1)
 
-    u = -2 * delta
+    # # Going straight
+    # K = 2
+    # u = -K * delta
+
+    # Going towards goal
+    k1 = .1
+    k2 = 1
+    theta_ref = np.arctan2((goal[1] - x[1]), (goal[0] - x[0]))
+    theta = x[2]
+    err_head = ((((theta_ref - theta) % 360) + 540) % 360) - 180
+    desired_steering = k1 * err_head
+    err_steering = ((((desired_steering - delta) % 360) + 540) % 360) - 180
+    u = k2 * (err_steering)
 
     # Saturate
     if np.abs(u) > max_steering_rate:
@@ -131,7 +142,7 @@ def getNomCntrl(x, goal, car):
 
     return float(u)
 
-def getBarrier(xy, svm_params, alpha, vectorized=True, loop=False, time_it=False, xdot=[]):
+def getBarrier(xy, svm_params, alpha, vectorized=True, loop=False, xdot=[]):
 
 
     gamma = svm_params["gamma"]
@@ -173,7 +184,8 @@ def getBarrier(xy, svm_params, alpha, vectorized=True, loop=False, time_it=False
         K_non_scaled = 4 * gamma ** 2 * temp.reshape((2, 2, 2))
         C2_outer = (np.array([C_outer.ravel(), C_outer.ravel()]).T * C).reshape(2, 2, 2)
         K = K_non_scaled * C2_outer
-        time_vec = (time.time() - start_time)
+        end_time = time.time()
+        time_vec = (end_time - start_time)
 
     if loop:
         start_time = time.time()

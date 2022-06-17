@@ -80,7 +80,7 @@ class CbfSafetyFilter:
         self.x_pose_buffer = pose_data.pose.pose.position.x
         self.y_pose_buffer = pose_data.pose.pose.position.y
 
-        # front axle car
+        # front axle car (car coordinates are for rear axle)
         self.xf_pose_buffer = self.x_pose_buffer + np.cos(self.yaw_pose_buffer) * self.car_length
         self.yf_pose_buffer = self.y_pose_buffer + np.sin(self.yaw_pose_buffer) * self.car_length
         
