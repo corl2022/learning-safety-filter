@@ -122,10 +122,6 @@ def getNomCntrl(x, goal, car):
     sgm = expit(x[3])
     delta = max_steering * (2 * sgm - 1)
 
-    # # Going straight
-    # K = 2
-    # u = -K * delta
-
     # Going towards goal
     k1 = .1
     k2 = 1

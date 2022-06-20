@@ -5,7 +5,7 @@ This is the code base for the CORL2022 submission "Learning Robust Input Constra
 ## Simulation
 
 Samples from the Euclidean Distance Function (EDF) of a road are loaded from 'simulation/data/sim_track_S.mat' and used to train a SVM regression model using scikit-learn ('https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html'). This model is used to compose a robust safety filter. The learned filter is then used in closed-loop simulation. For the dynamics of the car-like robot we use the modified kinematic bicycle model with constant velocity. The nominal steering angle is supervised by the learned safety filter.
-- 'main' runs the mßain simulation and plots the results.
+- 'main' runs the main simulation and plots the results.
 - 'control' contains the dynamics for the solver of the initial value problem, the filter and the nominal control.
 - 'car' contains the Car class with various parameters such as car length and velocity (of the front wheels). 
 
@@ -31,12 +31,17 @@ throttle_cmd = a.v + b
 The parameter "a" refers to 'vel2throttle_grad' and "b" to 'vel2throttle_off', both set in config/cbf_params.yaml. They need to be adjusted to the particular car.
 
 ## Vectorized computation 
-The efficient implementation using vectorized calculations is part of both the simulation and the ROS package. For the simulation, it is part of the function 
+The implementation using vectorized calculations is part of both the simulation and the ROS package. To compare the simulation time between the vectorized computation and that of a direct looop, in 'main' set the parameter
 ```
-def getBarrier(xy, svm_params, alpha, vectorized=True, loop=False, time_it=False, xdot=[]):
+run_loop = True
+```
+
+For the simulation, the vectorized calculation is part of the function 
+```
+def getBarrier(xy, svm_params, alpha, vectorized=True, loop=False, xdot=[]):
     ...
 ```
-with which we also compare computing time to a loop implementation. In the ROS package, the vectorized computation happens in 
+In the ROS package, the vectorized computation happens in 
 ```
 def getBarrierAndPartials(self):
     ...

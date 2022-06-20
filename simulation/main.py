@@ -17,9 +17,9 @@ if __name__ == '__main__':
     data = loadmat('data/sim_track_S.mat')
     edf = data['edf'][0]  # EDF for safe/unsafe region
     Xf = data['Xf']  # x-y position
-    X = data['X']
-    xx = data['xx']
-    yy = data['yy']
+    xx = data['xx']  # meshgrid x
+    yy = data['yy']  # meshgrid y
+    X = data['X']  # meshgrid as list
 
     # Scale data
     X_train, X_test, y_train, y_test = train_test_split(Xf, edf, test_size=0.5, random_state=0)
@@ -67,8 +67,6 @@ if __name__ == '__main__':
     cbf_gains = {"c1": 4, "c2": 4, "c3": 4}  # class-K functions; set to constants c1, c2, c3
     svm_params = {"b": model.intercept_, "dc": model.dual_coef_, "sv": model.support_vectors_,
                   "gamma": model.get_params()["gamma"], "scaler": scaler}
-    # x0 = np.array([30, 66, 0, 0])  # Initial condition [X,Y,heading,steering angle] in SI
-    # tend = 200  # simulation time
     x0 = np.array([14, 70, -np.pi * 1 / 3, 0])
     tend = 170  # simulation time
 
@@ -129,13 +127,13 @@ if __name__ == '__main__':
 
     # Barriers
     fig4, ax4 = plt.subplots()
-    ax4.plot(ode_sol_ct.t, h2_ct, label=r'$h_2$', linewidth=2)
-    ax4.plot(ode_sol_ct.t, h0_ct, label=r'$h_2$', linewidth=2)
-    ax4.plot([0, ode_sol_ct.t[-1]], [0] * 2, label='0 level set', linewidth=2)
-    ax4.plot(ode_sol_ct.t, Lfh2_Lgh2u_ch2_ct, label=r'$L_fh_2+L_gh_2u_{\rm or}+\alpha_2(h_2)$', linewidth=2)
-    ax4.plot(ode_sol_ct.t, Lfh2_Lgh2usafe_ch2_ct, label=r'$L_fh_2+L_gh_2u_{\rm safe}+\alpha_2(h_2)$', linewidth=2,
+    ax4.plot(ode_sol_ct.t, h2_ct, label=r'$h_2$', linewidth=1.5)
+    ax4.plot(ode_sol_ct.t, h0_ct, label=r'$h_2$', linewidth=1.5)
+    ax4.plot([0, ode_sol_ct.t[-1]], [0] * 2, label='0', linewidth=1, c='black')
+    ax4.plot(ode_sol_ct.t, Lfh2_Lgh2u_ch2_ct, label=r'$L_fh_2+L_gh_2u_{\rm or}+\alpha_2(h_2)$', linewidth=3)
+    ax4.plot(ode_sol_ct.t, Lfh2_Lgh2usafe_ch2_ct, label=r'$L_fh_2+L_gh_2u_{\rm safe}+\alpha_2(h_2)$', linewidth=1.5,
              linestyle='dashed')
-    ax4.plot(ode_sol_ct.t, Lfh2_Lgh2unom_ch2_ct, label=r'$L_fh_2+L_gh_2u_{\rm nom}+\alpha_2(h_2)$', linewidth=2,
+    ax4.plot(ode_sol_ct.t, Lfh2_Lgh2unom_ch2_ct, label=r'$L_fh_2+L_gh_2u_{\rm nom}+\alpha_2(h_2)$', linewidth=1.5,
              linestyle='dashed')
     plt.legend()
 
