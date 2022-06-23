@@ -31,7 +31,7 @@ throttle_cmd = a.v + b
 The parameter "a" refers to 'vel2throttle_grad' and "b" to 'vel2throttle_off', both set in config/cbf_params.yaml. They need to be adjusted to the particular car.
 
 ## Vectorized computation 
-The implementation using vectorized calculations is part of both the simulation and the ROS package. To compare the simulation time between the vectorized computation and that of a direct looop, in 'main' set the parameter
+The implementation using vectorized calculations is part of both the simulation and the ROS package. To compare the simulation time between the vectorized computation and that of a direct loop, in 'main' set the parameter
 ```
 run_loop = True
 ```
